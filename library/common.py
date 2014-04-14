@@ -1,0 +1,1 @@
+BATTLE_NET_HOST = 'eu.battle.net'
