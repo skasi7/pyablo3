@@ -94,13 +94,14 @@ class Profile(object):
     def get_heroes(self):
         return self.__heroes
 
-
-if __name__ == '__main__':
+def basic_config(host, port):
     # Connects to the proxy
-    proxy = urllib2.ProxyHandler({'http': 'http://127.0.0.1:3128'})
+    proxy = urllib2.ProxyHandler({'http': 'http://%s:%d' % (host, port)})
     opener = urllib2.build_opener(proxy)
     urllib2.install_opener(opener)
 
+
+if __name__ == '__main__':
     profile = Profile('Malcomdw#2986')
     profile.update()
 
