@@ -23,6 +23,9 @@ class Item(object):
     def get_type(self):
         return self.__item_dict['type']['id']
 
+    def get_gems(self):
+        return self.__item_dict['gems']
+
     def get_attributes(self):
         return self.__item_dict['attributes']
 
