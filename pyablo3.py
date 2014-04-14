@@ -2,12 +2,16 @@ import json
 import pprint
 import urllib2
 
+def basic_config(host, port):
+    # Connects to the proxy
+    proxy = urllib2.ProxyHandler({'http': 'http://%s:%d' % (host, port)})
+    opener = urllib2.build_opener(proxy)
+    urllib2.install_opener(opener)
+
 
 if __name__ == '__main__':
     # Connects to the proxy
-    proxy = urllib2.ProxyHandler({'http': 'http://127.0.0.1:3128'})
-    opener = urllib2.build_opener(proxy)
-    urllib2.install_opener(opener)
+    basic_config('127.0.0.1', 3128)
 
     profile = Profile('Malcomdw#2986')
     profile.update()
