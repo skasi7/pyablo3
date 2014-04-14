@@ -1,4 +1,4 @@
-import json
+import library.profile
 import pprint
 import urllib2
 
@@ -9,7 +9,7 @@ if __name__ == '__main__':
     opener = urllib2.build_opener(proxy)
     urllib2.install_opener(opener)
 
-    profile = Profile('Malcomdw#2986')
+    profile = library.profile.Profile('Malcomdw#2986')
     profile.update()
 
     heroes = profile.get_heroes()
