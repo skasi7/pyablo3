@@ -14,18 +14,20 @@ class Item(object):
     return self.__item_dict['name']
 
   def update(self):
-    pprint.pprint(self.__item_dict)
     url = urllib2.urlopen('http://%s/api/d3/data/%s' % (
       BATTLE_NET_HOST, self.__item_dict['tooltipParams']))
     result = json.loads(url.read())
-    pprint.pprint(result)
+    # pprint.pprint(result)
     self.__item_dict.update(result)
+
+  def get_type(self):
+    return self.__item_dict['type']['id']
 
   def get_raw_attributes(self):
     return self.__item_dict['attributesRaw']
 
   def __repr__(self):
-    return '<Item %s>' % (self.get_name())
+    return '<%s>' % (self.get_name())
 
 
 class Hero(object):
@@ -49,12 +51,13 @@ class Hero(object):
     return int(self.__hero_dict['level'])
 
   def __repr__(self):
-    return '<Hero %s: level %d %s>' % (self.get_name(), self.get_level(), self.get_class())
+    return '<%s: %s(lv %d)>' % (self.get_class(), self.get_name(), self.get_level())
 
   def update(self):
     url = urllib2.urlopen('http://%s/api/d3/profile/%s/hero/%d' % (
       BATTLE_NET_HOST, self.__profile.get_battle_tag(), self.get_id()))
     result = json.loads(url.read())
+    # pprint.pprint(result)
     self.__hero_dict.update(result)
 
     self.__items = self.__hero_dict.pop('items')
@@ -85,6 +88,7 @@ class Profile(object):
     url = urllib2.urlopen('http://%s/api/d3/profile/%s/' % (
       BATTLE_NET_HOST, self.__battle_tag))
     result = json.loads(url.read())
+    # pprint.pprint(result)
     self.__heroes = list()
     for hero_dict in result['heroes']:
       self.__heroes.append(Hero(self, hero_dict))
@@ -102,13 +106,25 @@ if __name__ == '__main__':
   profile = Profile('Malcomdw#2986')
   profile.update()
 
-  for hero in profile.get_heroes():
-    print hero
+  heroes = profile.get_heroes()
+  for idx, hero in enumerate(heroes):
+    print '%d: %s (%s)' % (idx, hero.get_name(), hero.get_class())
+
+  hero_idx = int(raw_input('Select a hero> '))
+  hero = heroes[hero_idx]
   hero.update()
 
-  for item in hero.get_items().values():
-    pass
+  items = hero.get_items()
+  items_idx = list()
+  for idx, (position, item) in enumerate(items.iteritems()):
+    items_idx.append(item)
+    print '%d: %s - %s' % (idx, position, item.get_name())
+
+  item_idx = int(raw_input('Select an item> '))
+  item = items_idx[item_idx]
   item.update()
+
+  pprint.pprint(item.get_raw_attributes())
 
   # item = Item('CnYI1prOpQ8SBwgEFVX89CQdhyPHTh3tcAetHdSUxQkddCjasB1FtflLHW6Ld_AiCwgAFar-AQAYNCAIMIkCON4DQABID1AQYN4DaisKDAgAEP3Z3diAgICgChIbCN3v4fMNEgcIBBVo9YtfMIsCOABAAVgEkAEAGKrxp88EUAZYAA')
   # item.update()
