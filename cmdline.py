@@ -1,4 +1,4 @@
-import json
+import library.profile
 import pprint
 import urllib2
 
@@ -13,7 +13,7 @@ if __name__ == '__main__':
     # Connects to the proxy
     basic_config('127.0.0.1', 3128)
 
-    profile = Profile('Malcomdw#2986')
+    profile = library.profile.Profile('Malcomdw#2986')
     profile.update()
 
     heroes = profile.get_heroes()

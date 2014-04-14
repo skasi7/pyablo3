@@ -1,7 +1,7 @@
 import json
 import library.common
+import library.hero
 import urllib2
-import hero
 
 class Profile(object):
     def __init__(self, battle_tag):
@@ -19,7 +19,7 @@ class Profile(object):
         # pprint.pprint(result)
         self.__heroes = list()
         for hero_dict in result['heroes']:
-            self.__heroes.append(hero.Hero(self, hero_dict))
+            self.__heroes.append(library.hero.Hero(self, hero_dict))
 
     def get_heroes(self):
         return self.__heroes
