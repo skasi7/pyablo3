@@ -26,7 +26,7 @@ class Item(object):
     def get_raw_attributes(self):
         return self.__item_dict['attributesRaw']
 
-    def get_raw_attr(self, attr, exact=True):
+    def get_raw_attribute(self, attr, exact=True):
         if exact:
             if attr in self.get_raw_attributes():
                 return (self.get_raw_attributes()[attr]['max'] + self.get_raw_attributes()[attr]['min']) / 2
