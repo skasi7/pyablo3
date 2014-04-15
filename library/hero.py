@@ -14,6 +14,14 @@ class Hero(object):
     def get_class(self):
         return self.__hero_dict['class']
 
+    def get_main_stat(self):
+        if self.get_class() in 'demon-hunter' or self.get_class() in 'monk':
+            return 'dexterity'
+        elif self.get_class() in 'witch-doctor' or self.get_class() in 'wizard':
+            return 'intelligence'
+        elif self.get_class() in 'crusader' or self.get_class() in 'barbarian':
+            return 'strength'
+
     def get_name(self):
         return self.__hero_dict['name']
 

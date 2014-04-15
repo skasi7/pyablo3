@@ -68,20 +68,13 @@ if __name__ == '__main__':
     profile = library.profile.Profile('Malcomdw#2986')
     profile.update()
 
-    hero = profile.get_heroes()[0]
-    hero.update()
-    print hero.get_name()
-    print hero.get_stats()
-
-    dexterity = hero.get_stats()['dexterity']
-
-    print '> All'
-    total = process_items(hero.get_items(), ('dexterity', hero.get_stats()['dexterity']))
-
-    for k, v in hero.get_items().iteritems():
-        items = hero.get_items().copy()
-        del items[k]
-        result = process_items(items, ('dexterity', hero.get_stats()['dexterity']))
-        print '> -%s %.4f' % (k, (total - result) / total * 100)
-
-
+    for hero in profile.get_heroes():
+        hero.update()
+        hero_info = (hero.get_main_stat(), hero.get_stats()[hero.get_main_stat()])
+        print hero.get_name()
+        total = process_items(hero.get_items(), hero_info)
+        for k, v in hero.get_items().iteritems():
+            items = hero.get_items().copy()
+            del items[k]
+            result = process_items(items, ('dexterity', hero.get_stats()['dexterity']))
+            print '> -%s %.4f' % (k, (total - result) / total * 100)
