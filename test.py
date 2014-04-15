@@ -6,21 +6,20 @@ import re
 
 if __name__ == '__main__':
     # Connects to the proxy
-    #cmdline.basic_config('127.0.0.1', 5865)
+    cmdline.basic_config('127.0.0.1', 5865)
 
     profile = library.profile.Profile('Malcomdw#2986')
     profile.update()
 
-    hero = profile.get_heroes()[3]
+    hero = profile.get_heroes()[0]
     hero.update()
     print hero.get_name()
     print hero.get_stats()
 
-    # dexterity = hero.get_stats()['dexterity']
-    dexterity = hero.get_stats()['intelligence']
+    dexterity = hero.get_stats()['dexterity']
     haste = 0.0  #hero.get_stats()['attackSpeed']
-    critical_per = hero.get_stats()['critChance']
-    critical_dmg = hero.get_stats()['critDamage']
+    critical_per = 0.0  # hero.get_stats()['critChance']
+    critical_dmg = 0.0  # hero.get_stats()['critDamage']
     weapon_dmg = 0.0
     weapon_haste = 0.0
 
@@ -28,9 +27,7 @@ if __name__ == '__main__':
         item.update()
         print '> ', pos
         print item.get_raw_attributes()
-
-        dexterity += item.get_raw_attribute('Intelligence_Item')
-        # dexterity += item.get_raw_attribute('Dexterity_Item')
+        dexterity += item.get_raw_attribute('Dexterity_Item')
         haste += item.get_raw_attribute('Attacks_Per_Second_Percent')
         critical_per += item.get_raw_attribute('Crit_Percent_Bonus_Capped')
         critical_dmg += item.get_raw_attribute('Crit_Damage_Percent')
@@ -48,21 +45,23 @@ if __name__ == '__main__':
 
         gems = item.get_gems()
         for gem in gems:
+            print '>> gem: ', gem
             item_gem = library.item.Item(gem)
             weapon_dmg += item_gem.get_raw_attribute(re.compile(r'Damage_Weapon.*'))
-            #dexterity += item.get_raw_attribute('Intelligence_Item')
+            dexterity += item_gem.get_raw_attribute('Dexterity_Item')
+            critical_dmg += item_gem.get_raw_attribute('Crit_Damage_Percent')
 
-
-    print dexterity
-    print haste
-    print critical_per
-    print critical_dmg
-    print weapon_haste
-    print weapon_dmg, weapon_dmg * weapon_haste
+    print 'Main stat    %d' % dexterity
+    print 'Haste        %.2f' % haste
+    print 'Critical     %.2f' % critical_per
+    print 'Critical dmg %.2f' % critical_dmg
+    print 'Weapon spd   %.2f' % weapon_haste
+    print 'Weapon dmg   %.2f' % weapon_dmg
+    print 'Weapon avg   %.2f' % (weapon_dmg * weapon_haste)
 
     s = dexterity * 0.01 + 1
     c = critical_per * critical_dmg + 1
-    r = weapon_haste
+    r = weapon_haste * (1 + haste)
     a = weapon_dmg
     m = 1.0  #Skill enhancement %
 
