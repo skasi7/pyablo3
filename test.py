@@ -23,10 +23,10 @@ def process_items(items, main_stat, elemental_bonus):
         critical_dmg += item.get_raw_attribute('Crit_Damage_Percent')
 
         # Look for elemental bonus, just one
-        for k in elemental_bonus:
-            value = item.get_raw_attribute('Damage_Dealt_Percent_Bonus#%s' % k)
+        for element in elemental_bonus:
+            value = item.get_raw_attribute('Damage_Dealt_Percent_Bonus#%s' % element)
             if value != 0.0:
-                elemental_bonus[k] += value
+                elemental_bonus[element] += value
                 break
 
         # Just once
@@ -76,19 +76,14 @@ if __name__ == '__main__':
     for hero in [profile.get_heroes()[0]]:
         # for hero in profile.get_heroes():
         hero.update()
-        print
-        print hero.get_name()
 
         elemental_bonus = {'Fire': 1.0, 'Cold': 1.0, 'Lightning': 1.0, 'Poison': 1.0, 'Holy': 1.0, 'Physical': 1.0}
         hero_info = (hero.get_main_stat(), hero.get_stats()[hero.get_main_stat()])
         total = process_items(hero.get_items(), hero_info, elemental_bonus)
-        print '+ Damage %d' % total
-        for k, v in hero.get_items().iteritems():
-            items = hero.get_items().copy()
-            del items[k]
-            result = process_items(items, hero_info, dict())
-            print '> %-11s %.2f' % (k, (total - result) / total * 100)
+        print
+        print '%s - Damage %d' % (hero.get_name(), total)
 
+        # Calculate skills damage
         skills = hero.get_skills()
         for skill in skills['active']:
             print skill['skill']['name']
@@ -112,3 +107,9 @@ if __name__ == '__main__':
             else:
                 print '+ Damage N/A'
 
+        # Calculate item damage contribution
+        for k, v in hero.get_items().iteritems():
+            items = hero.get_items().copy()
+            del items[k]
+            result = process_items(items, hero_info, dict())
+            print '> %-11s %.2f' % (k, (total - result) / total * 100)
