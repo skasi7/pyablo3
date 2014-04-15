@@ -70,11 +70,27 @@ if __name__ == '__main__':
 
     for hero in profile.get_heroes():
         hero.update()
-        hero_info = (hero.get_main_stat(), hero.get_stats()[hero.get_main_stat()])
+        print
         print hero.get_name()
-        total = process_items(hero.get_items(), hero_info)
-        for k, v in hero.get_items().iteritems():
-            items = hero.get_items().copy()
-            del items[k]
-            result = process_items(items, hero_info)
-            print '> %-11s %.2f' % (k, (total - result) / total * 100)
+        skills = hero.get_skills()
+        for skill in skills['active']:
+            print skill['skill']['name']
+            tokens = skill['rune']['description'].split()
+            t = [float(x[:x.find('%')]) for x in tokens if '%' in x]
+            if len(t):
+                print '+ Damage', max(t), '%'
+            else:
+                print '+ Damage N/A'
+            t = [x for x in tokens if x in ('Fire', 'Cold', 'Lightning', 'Holy', 'Physical')]
+            if len(t):
+                print '> Type', set(t).pop()
+            else:
+                print '> Type N/A'
+                # hero_info = (hero.get_main_stat(), hero.get_stats()[hero.get_main_stat()])
+                # print hero.get_name()
+                # total = process_items(hero.get_items(), hero_info)
+                # for k, v in hero.get_items().iteritems():
+                #     items = hero.get_items().copy()
+                #     del items[k]
+                #     result = process_items(items, hero_info)
+                #     print '> %-11s %.2f' % (k, (total - result) / total * 100)
