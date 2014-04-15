@@ -76,5 +76,5 @@ if __name__ == '__main__':
         for k, v in hero.get_items().iteritems():
             items = hero.get_items().copy()
             del items[k]
-            result = process_items(items, ('dexterity', hero.get_stats()['dexterity']))
-            print '> -%s %.4f' % (k, (total - result) / total * 100)
+            result = process_items(items, hero_info)
+            print '> %-11s %.2f' % (k, (total - result) / total * 100)
