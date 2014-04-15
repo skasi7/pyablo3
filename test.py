@@ -5,9 +5,9 @@ import library.item
 import re
 
 
-def process_items(items, main_stat):
+def process_items(items, main_stat, elemental_bonus):
     stat = main_stat[1]
-    haste = 0.0  #hero.get_stats()['attackSpeed']
+    haste = 0.0  # hero.get_stats()['attackSpeed']
     critical_per = 0.0  # hero.get_stats()['critChance']
     critical_dmg = 0.0  # hero.get_stats()['critDamage']
     weapon_dmg = 0.0
@@ -21,6 +21,13 @@ def process_items(items, main_stat):
         haste += item.get_raw_attribute('Attacks_Per_Second_Percent')
         critical_per += item.get_raw_attribute('Crit_Percent_Bonus_Capped')
         critical_dmg += item.get_raw_attribute('Crit_Damage_Percent')
+
+        # Look for elemental bonus, just one
+        for k in elemental_bonus:
+            value = item.get_raw_attribute('Damage_Dealt_Percent_Bonus#%s' % k)
+            if value != 0.0:
+                elemental_bonus[k] += value
+                break
 
         # Just once
         if weapon_dmg == 0.0:
@@ -53,12 +60,10 @@ def process_items(items, main_stat):
     c = critical_per * critical_dmg + 1
     r = weapon_haste * (1 + haste)
     a = weapon_dmg
-    m = 1.0  #Skill enhancement %
+    m = 1.0  # Skill enhancement %
 
-    result = (max(1, s) * max(1, c) * max(1, r) * max(10, a) * max(1, m))
+    return max(1, s) * max(1, c) * max(1, r) * max(10, a) * max(1, m)
     # print 'Total %d' % result
-
-    return result
 
 
 if __name__ == '__main__':
@@ -68,29 +73,42 @@ if __name__ == '__main__':
     profile = library.profile.Profile('Malcomdw#2986')
     profile.update()
 
-    for hero in profile.get_heroes():
+    for hero in [profile.get_heroes()[0]]:
+        # for hero in profile.get_heroes():
         hero.update()
         print
         print hero.get_name()
+
+        elemental_bonus = {'Fire': 1.0, 'Cold': 1.0, 'Lightning': 1.0, 'Poison': 1.0, 'Holy': 1.0, 'Physical': 1.0}
+        hero_info = (hero.get_main_stat(), hero.get_stats()[hero.get_main_stat()])
+        total = process_items(hero.get_items(), hero_info, elemental_bonus)
+        print '+ Damage %d' % total
+        for k, v in hero.get_items().iteritems():
+            items = hero.get_items().copy()
+            del items[k]
+            result = process_items(items, hero_info, dict())
+            print '> %-11s %.2f' % (k, (total - result) / total * 100)
+
         skills = hero.get_skills()
         for skill in skills['active']:
             print skill['skill']['name']
+
             tokens = skill['rune']['description'].split()
+            # Guess damage type
+            t = [x for x in tokens if x in elemental_bonus]
+            if len(t):
+                dmg_type = set(t).pop()
+                print '> Type', dmg_type
+            else:
+                dmg_type = 'Physical'
+                print '> Type N/A (Physical?)'
+
+            # Guess damage increment
+            tokens.append(skill['skill']['description'].split())
             t = [float(x[:x.find('%')]) for x in tokens if '%' in x]
             if len(t):
-                print '+ Damage', max(t), '%'
+                print '+ Damage %d (%d%% + %d%%)' % (
+                    (total * max(t) / 100) * elemental_bonus[dmg_type], max(t), ((elemental_bonus[dmg_type] - 1) * 100))
             else:
                 print '+ Damage N/A'
-            t = [x for x in tokens if x in ('Fire', 'Cold', 'Lightning', 'Holy', 'Physical')]
-            if len(t):
-                print '> Type', set(t).pop()
-            else:
-                print '> Type N/A'
-                # hero_info = (hero.get_main_stat(), hero.get_stats()[hero.get_main_stat()])
-                # print hero.get_name()
-                # total = process_items(hero.get_items(), hero_info)
-                # for k, v in hero.get_items().iteritems():
-                #     items = hero.get_items().copy()
-                #     del items[k]
-                #     result = process_items(items, hero_info)
-                #     print '> %-11s %.2f' % (k, (total - result) / total * 100)
+
